@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaLearn — Interactive Language Learning App</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>🌍 LinguaLearn</h1>
+      <div class="sub">Daily flashcards, quizzes &amp; progress tracking</div>
+    </div>
+    <div class="lang-picker" id="langPicker"></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="learn">📚 Learn</div>
+    <div class="tab" data-tab="quiz">🧠 Quiz</div>
+    <div class="tab" data-tab="stats">📊 Progress</div>
+    <div class="tab" data-tab="add">➕ My Words</div>
+  </div>
+
+  <!-- LEARN -->
+  <div class="panel active" id="panel-learn">
+    <div class="toolbar">
+      <select id="catSelect"></select>
+      <span style="color:var(--muted);font-size:12px">Tap card to flip 🔁</span>
+    </div>
+    <div class="grid" id="catGrid"></div>
+    <div class="flash" id="flashWrap" style="display:none;margin-top:16px">
+      <div class="flash-inner" id="flashInner">
+        <div class="face front">
+          <div class="word" id="fWord"></div>
+          <div class="phon" id="fPhon"></div>
+          <button class="speak" id="speakBtn">🔊</button>
+        </div>
+        <div class="face back">
+          <div class="word" id="bTrans" style="font-size:26px"></div>
+          <div class="example" id="bEx"></div>
+          <div class="example" id="bExT" style="color:var(--muted);font-size:13px"></div>
+          <div class="tip" id="bTip"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flash-nav" id="flashNav" style="display:none">
+      <button class="btn ghost" id="prevBtn">◀ Prev</button>
+      <button class="btn btn-ok" id="knownBtn">✓ I know this</button>
+      <button class="btn ghost" id="nextBtn">Next ▶</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="panel" id="panel-quiz">
+    <div id="quizSetup" style="max-width:560px;margin:0 auto">
+      <div class="quiz-box">
+        <h3 style="margin-top:0">🧠 Practice Quiz</h3>
+        <p style="color:var(--muted);font-size:13px">10 questions · translation, fill-in-the-blank &amp; listening</p>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Category</div>
+          <select id="quizCat" style="width:100%"></select>
+        </div>
+        <button class="btn" style="width:100%" id="startQuizBtn">Start Quiz ▶</button>
+      </div>
+    </div>
+    <div id="quizPlay" style="display:none;max-width:560px;margin:0 auto">
+      <div class="quiz-header"><span id="qNum"></span><span id="qScore"></span></div>
+      <div class="qbar"><div id="qBarFill" style="width:0%"></div></div>
+      <div class="quiz-box">
+        <div id="qPrompt" style="font-size:18px;font-weight:700;margin-bottom:16px;line-height:1.5"></div>
+        <div id="qSpeakRow"></div>
+        <div id="qOpts"></div>
+        <div id="qFeedback" style="min-height:24px;font-size:13px;margin-top:4px;font-weight:600"></div>
+        <button class="btn" id="qNext" style="display:none;width:100%">Next ▶</button>
+      </div>
+    </div>
+    <div id="quizResult" style="display:none;max-width:560px;margin:0 auto">
+      <div class="quiz-box" style="text-align:center">
+        <div style="font-size:40px" id="rEmoji"></div>
+        <div class="result-big" id="rScore"></div>
+        <p id="rMsg" style="color:var(--muted);font-size:14px"></p>
+        <div id="rReview" style="text-align:left;margin:14px 0"></div>
+        <button class="btn" id="retryBtn">🔁 Try Again</button>
+        <button class="btn ghost" id="changeCatBtn">Change Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="panel" id="panel-stats">
+    <div class="stats" id="statCards"></div>
+    <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid #31376e">
+      <h3 style="margin:0 0 10px;font-size:15px">📖 Word Bank</h3>
+      <div style="overflow-x:auto">
+        <table class="table"><thead><tr><th>Word</th><th>Translation</th><th>Category</th><th>Status</th><th></th></tr></thead>
+        <tbody id="bankBody"></tbody></table>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn sm ghost" id="exportBtn">⬇ Export JSON</button>
+        <button class="btn sm ghost" id="importBtn">⬆ Import</button>
+        <input type="file" id="importFile" accept=".json" style="display:none">
+        <button class="btn sm btn-fire" id="cloudSaveBtn">☁️ Sync to Cloud</button>
+        <button class="btn sm ghost" id="cloudLoadBtn">☁️ Restore from Cloud</button>
+        <button class="btn sm btn-danger" id="resetBtn">🗑 Reset Progress</button>
+      </div>
+      <p id="cloudStatus" style="color:var(--muted);font-size:12px;margin:10px 0 0"></p>
+    </div>
+  </div>
+
+  <!-- ADD WORDS -->
+  <div class="panel" id="panel-add">
+    <div style="max-width:560px;margin:0 auto">
+      <div class="quiz-box">
+        <h3 style="margin-top:0">➕ Add Your Own Word</h3>
+        <div class="form-row"><input type="text" id="awWord" placeholder="Word (target language)"></div>
+        <div class="form-row"><input type="text" id="awTrans" placeholder="Translation (English)"></div>
+        <div class="form-row"><input type="text" id="awPhon" placeholder="Pronunciation / phonetic (optional)"></div>
+        <div class="form-row"><input type="text" id="awEx" placeholder="Example sentence (optional)"></div>
+        <div class="form-row"><input type="text" id="awTip" placeholder="Memory tip (optional)"></div>
+        <div class="form-row">
+          <select id="awCat" style="flex:1"></select>
+          <button class="btn" id="addWordBtn">Add ✚</button>
+        </div>
+      </div>
+      <div id="myWords" style="margin-top:14px"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK (v10, compat for simplicity) — optional, app works fully offline without it -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script src="js/data.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/firebase-sync.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
